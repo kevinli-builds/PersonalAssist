@@ -1,0 +1,17 @@
+{
+  "name": "PersonalAssist",
+  "short_name": "Assist",
+  "description": "Type it once. Never forget it.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f8f7",
+  "theme_color": "#0f766e",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

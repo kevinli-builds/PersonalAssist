@@ -1,0 +1,28 @@
+{
+  "name": "personal-assist",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3005",
+    "build": "prisma generate && next build",
+    "start": "next start -p 3005",
+    "postinstall": "prisma generate",
+    "db:push": "prisma db push"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.110.0",
+    "@prisma/client": "^5.22.0",
+    "next": "^16.2.6",
+    "prisma": "^5.22.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "@types/web-push": "^3.6.4",
+    "typescript": "^5.5.0"
+  }
+}

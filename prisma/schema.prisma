@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// One remembered fact/event, extracted by Claude from a freeform message.
+model Entry {
+  id         String     @id @default(cuid())
+  type       String // event | health | birthday | task | note
+  title      String
+  date       DateTime? // primary date of the thing itself (past or future)
+  recurrence String? // "yearly" → reminders auto-reschedule; anything else is informational
+  tags       String     @default("") // comma-separated lowercase tags
+  note       String     @default("")
+  raw        String // the original message as typed
+  createdAt  DateTime   @default(now())
+  reminders  Reminder[]
+}
+
+model Reminder {
+  id        String   @id @default(cuid())
+  entryId   String
+  entry     Entry    @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  remindAt  DateTime
+  label     String
+  sent      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// Web Push subscription per browser/device.
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+}
+
+// Bearer sessions — only the sha256 hash of the token is stored.
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
