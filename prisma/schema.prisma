@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // Supabase transaction pooler (port 6543, pgbouncer=true)
+  directUrl = env("DIRECT_URL") // Supabase direct/session connection (port 5432) — used by db push
 }
 
 // One remembered fact/event, extracted by Claude from a freeform message.

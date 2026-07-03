@@ -20,7 +20,7 @@ Single-user app for **snowwarrior1-alt**. Built in Claude Code sessions.
 |---|---|
 | App | Next.js 16 App Router (frontend + API routes, one deploy) |
 | Language | TypeScript |
-| ORM / DB | Prisma v5 / PostgreSQL (Neon) |
+| ORM / DB | Prisma v5 / PostgreSQL (Supabase — pooler URL at runtime, `DIRECT_URL` for `db push`) |
 | AI | Anthropic `@anthropic-ai/sdk` — `claude-opus-4-8` default (`CLAUDE_MODEL` env overrides; `claude-haiku-4-5` for cheap) |
 | Push | `web-push` (VAPID), service worker at `public/sw.js`, installable PWA |
 | Hosting | Vercel (API routes are short-lived — no long-running syncs) |
@@ -76,7 +76,9 @@ PersonalAssist/
 
 ## Env vars (see .env.example)
 
-`DATABASE_URL`, `ANTHROPIC_API_KEY`, `APP_PASSWORD`, `CRON_SECRET`,
+`DATABASE_URL` (Supabase transaction pooler, `?pgbouncer=true&connection_limit=1`),
+`DIRECT_URL` (Supabase direct connection — Prisma `directUrl`, needed for `db push`),
+`ANTHROPIC_API_KEY`, `APP_PASSWORD`, `CRON_SECRET`,
 `WEB_PUSH_PUBLIC_KEY`/`WEB_PUSH_PRIVATE_KEY`/`WEB_PUSH_SUBJECT`,
 `NEXT_PUBLIC_VAPID_PUBLIC_KEY` (= public key, for the browser),
 optional `CLAUDE_MODEL`.

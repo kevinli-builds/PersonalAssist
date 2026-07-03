@@ -7,7 +7,7 @@ A personal memory assistant: type a quick freeform message ("just donated blood 
 ## Stack
 
 - **Next.js** (App Router) — frontend + API routes in one deploy (Vercel)
-- **Prisma + PostgreSQL** (Neon free tier)
+- **Prisma + PostgreSQL** (Supabase free tier)
 - **Anthropic Claude API** — message parsing (structured JSON output) + Q&A
 - **Web Push** (VAPID) — reminder notifications, works as an installable PWA
 - Single-user auth: `APP_PASSWORD` login → hashed bearer session token
@@ -17,7 +17,8 @@ A personal memory assistant: type a quick freeform message ("just donated blood 
 ```bash
 npm install
 
-# 1. Create a Postgres DB (e.g. neon.tech) and copy the connection string
+# 1. Create a Supabase project (supabase.com) and copy the two Prisma
+#    connection strings from Connect → ORMs (pooler + direct)
 # 2. Generate VAPID keys for push:
 npx web-push generate-vapid-keys
 
@@ -40,7 +41,7 @@ npm run dev   # http://localhost:3005
 
 1. Push this repo to GitHub, import into Vercel.
 2. Set all env vars from `.env.example` in the Vercel project settings.
-3. Run `npm run db:push` locally against the production `DATABASE_URL` once (creates tables).
+3. Run `npm run db:push` locally once (creates the tables — it uses `DIRECT_URL`).
 4. Deploy. Install the PWA on your phone and enable notifications.
 
 ## Cost note
