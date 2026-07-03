@@ -1,11 +1,16 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL") // Supabase transaction pooler (port 6543, pgbouncer=true)
   directUrl = env("DIRECT_URL") // Supabase direct/session connection (port 5432) — used by db push
+  // This Supabase project is shared with another app (Furnisher) whose tables
+  // live in `public`. PersonalAssist is isolated in its own `personalassist`
+  // schema so the two never collide. Prisma only manages the schemas listed here.
+  schemas   = ["personalassist"]
 }
 
 // One remembered fact/event, extracted by Claude from a freeform message.
@@ -20,6 +25,8 @@ model Entry {
   raw        String // the original message as typed
   createdAt  DateTime   @default(now())
   reminders  Reminder[]
+
+  @@schema("personalassist")
 }
 
 model Reminder {
@@ -30,6 +37,8 @@ model Reminder {
   label     String
   sent      Boolean  @default(false)
   createdAt DateTime @default(now())
+
+  @@schema("personalassist")
 }
 
 // Web Push subscription per browser/device.
@@ -39,6 +48,8 @@ model PushSubscription {
   p256dh    String
   auth      String
   createdAt DateTime @default(now())
+
+  @@schema("personalassist")
 }
 
 // Bearer sessions — only the sha256 hash of the token is stored.
@@ -47,4 +58,6 @@ model Session {
   tokenHash String   @unique
   expiresAt DateTime
   createdAt DateTime @default(now())
+
+  @@schema("personalassist")
 }

@@ -20,7 +20,7 @@ Single-user app for **snowwarrior1-alt**. Built in Claude Code sessions.
 |---|---|
 | App | Next.js 16 App Router (frontend + API routes, one deploy) |
 | Language | TypeScript |
-| ORM / DB | Prisma v5 / PostgreSQL (Supabase — pooler URL at runtime, `DIRECT_URL` for `db push`) |
+| ORM / DB | Prisma v5 / PostgreSQL (Supabase — pooler URL at runtime, `DIRECT_URL` for `db push`). **Shares a Supabase project with Furnisher**: Furnisher owns `public`; PersonalAssist is isolated in its own `personalassist` Postgres schema (Prisma `multiSchema` preview + `@@schema("personalassist")` on every model) so the two apps never collide. |
 | AI | Anthropic `@anthropic-ai/sdk` — `claude-opus-4-8` default (`CLAUDE_MODEL` env overrides; `claude-haiku-4-5` for cheap) |
 | Push | `web-push` (VAPID), service worker at `public/sw.js`, installable PWA |
 | Hosting | Vercel (API routes are short-lived — no long-running syncs) |
