@@ -184,3 +184,47 @@ nudges (T−14 for yearly entries).
   demand for out-of-app capture.
 - Household/multi-user mode — explicit user pull only.
 - Login rate limiting (section 3 #1) is still open — do with W1.
+
+---
+
+## 9. Depth roadmap — serving the current user (2026-07-05)
+
+_Direction change: depth for the one real user. PersonalAssist becomes more
+valuable the more its memory is USED between captures — these features make
+stored entries work harder._
+
+### M1 — Interval intelligence (M) ⭐
+For recurring facts (haircut, dentist, donation, oil change): learn the
+typical interval from the entry history and surface drift — "you usually go
+~11 weeks between cuts; it has been 14." Auto-suggest the next reminder at
+save time ("remind you around March 3?"). Pure date math over entries
+grouped by tag; no LLM.
+
+### M2 — Ask with citations + prefilter (M) ⭐
+Before calling Claude, prefilter entries by type/tag/date parsed from the
+question (cheap heuristics); the answer cites which entries it used
+(tappable ids → timeline scroll). Cheaper, faster, and trustworthy —
+"where did that answer come from" is THE trust question for a memory tool.
+
+### M3 — Entity pages (M)
+Tag-based person/topic pages: a "Mom" page collects every entry mentioning
+her — birthday countdown, gift history, last visit. One route + a tag
+index; the parse prompt already extracts tags.
+
+### M4 — Health record card (S, high personal value)
+type=health entries rendered as a structured immunization/checkup list
+(date, what, where) with a print stylesheet — the thing you actually need
+in a doctor's waiting room. Zero new data; one view.
+
+### M5 — Year ahead view (S)
+A 12-month strip of everything known about the future (reminders, events,
+birthdays, letters-to-self unlock dates). The complement to the timeline's
+past view; answers "what is coming?" at a glance.
+
+### M6 — Memory freshness review (M, tentative)
+Facts go stale. A gentle review queue ("saved 8 months ago: `parking spot
+B4` — still true?") with keep/update/archive. Spaced-repetition cadence,
+capped at 3 per week — maintenance, not homework.
+
+### Sequencing: M2 first (it upgrades every future feature and cuts Ask
+cost), then M1 + M5 (the assistant starts anticipating), then M3/M4.
