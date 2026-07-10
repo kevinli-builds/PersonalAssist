@@ -8,6 +8,12 @@ Verify current state before implementing._
 
 ---
 
+## 0. Status ledger (2026-07-05) + how to pick up
+
+**Shipped ✓** — capture→confirm→save + timeline + ask + web-push scaffold; Postgres-schema isolation on the shared Supabase project. Per memory it is deployed, but **end-to-end delivery is UNVERIFIED**.
+**Next → (do in this order)** — P0 prove the loop (PWA installed, a real push received, the 30-min GitHub Action firing) + fix the **login rate-limit gap** (§3 #1 — a public URL guarding all personal data on one password); then §9 M2 Ask-with-citations ⭐ (upgrades every later feature + cuts Ask cost) and M1 interval-intelligence ⭐; §6 morning briefing; P1 entry editing + timeline search.
+**Single-user tool** — "depth" here means the stored memory works harder between captures (§9), not new users.
+
 ## 1. Product roadmap (PM)
 
 This is a single-user tool; "drawing users" means making it indispensable to its
