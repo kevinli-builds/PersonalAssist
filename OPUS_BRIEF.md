@@ -234,3 +234,32 @@ capped at 3 per week — maintenance, not homework.
 
 ### Sequencing: M2 first (it upgrades every future feature and cuts Ask
 cost), then M1 + M5 (the assistant starts anticipating), then M3/M4.
+
+---
+
+## 10. Code-quality & security audit (2026-07-12, Fable portfolio pass)
+
+_This repo is PUBLIC. The one live-security item (login brute-force / rate-limit
+gap) is tracked with detail in `C:\Users\snoww\PORTFOLIO_SECURITY_AUDIT.md` (home
+dir, not a git repo). Read it before the next hardening pass. Non-sensitive notes:_
+
+**Auth is otherwise in good shape** — every data/Claude route calls
+`requireSession`; the cron endpoint is `CRON_SECRET`-guarded with a constant-time
+compare; `parse`/`ask` cap input length (2000/1000 chars), which bounds both prompt
+size and Claude cost. Single-user model means no IDOR surface. Good baseline.
+
+**S1 — login has no rate limiting (the one real gap).** `POST /api/auth/login`
+compares against a single `APP_PASSWORD` with no throttle or lockout, so it's an
+unauthenticated brute-force oracle guarding all your personal/health data. Fix:
+a DB-backed failed-attempt counter with backoff/lockout (in-memory won't survive
+Vercel's serverless instances). Detail + options in the private audit doc. Pair a
+strong `APP_PASSWORD` in the meantime.
+
+**Quality — low priority:**
+- `safeEqual` sha256-hashes both sides before `timingSafeEqual` — correct, avoids
+  the length-leak; keep it. (Just flagging it's intentional, not accidental.)
+- 180-day session TTL is long for a single-secret app; consider 30–60d + a visible
+  "sign out everywhere" (deleteMany sessions) once M-series ships.
+- No automated tests. Lower value than the app repos with aggregation logic, but
+  `lib/claude.ts` date-resolution (relative → absolute in a given timezone) is the
+  one place a fixture test would pay off (it's the source of "in 8 weeks" bugs).
