@@ -52,6 +52,20 @@ model PushSubscription {
   @@schema("personalassist")
 }
 
+// Failed login attempts — powers per-IP rate limiting / lockout on
+// POST /api/auth/login. In-memory counters don't survive Vercel serverless
+// (each request may hit a fresh instance), so the throttle state lives in the DB.
+// Rows older than the window are swept opportunistically; a successful login
+// clears the offending IP's rows.
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  ip        String
+  createdAt DateTime @default(now())
+
+  @@index([ip, createdAt])
+  @@schema("personalassist")
+}
+
 // Bearer sessions — only the sha256 hash of the token is stored.
 model Session {
   id        String   @id @default(cuid())

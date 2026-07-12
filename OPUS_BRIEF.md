@@ -11,7 +11,10 @@ Verify current state before implementing._
 ## 0. Status ledger (2026-07-05) + how to pick up
 
 **Shipped ✓** — capture→confirm→save + timeline + ask + web-push scaffold; Postgres-schema isolation on the shared Supabase project. Per memory it is deployed, but **end-to-end delivery is UNVERIFIED**.
-**Next → (do in this order)** — P0 prove the loop (PWA installed, a real push received, the 30-min GitHub Action firing) + fix the **login rate-limit gap** (§3 #1 — a public URL guarding all personal data on one password); then §9 M2 Ask-with-citations ⭐ (upgrades every later feature + cuts Ask cost) and M1 interval-intelligence ⭐; §6 morning briefing; P1 entry editing + timeline search.
+**Security ✅ (2026-07-12)** — the login rate-limit gap (§3 #1 / S1) is fixed: per-IP
+sliding-window lockout in `lib/loginThrottle.ts` (§10). Needs `npm run db:push` at deploy
+to create the `LoginAttempt` table.
+**Next → (do in this order)** — P0 prove the loop (PWA installed, a real push received, the 30-min GitHub Action firing); then §9 M2 Ask-with-citations ⭐ (upgrades every later feature + cuts Ask cost) and M1 interval-intelligence ⭐; §6 morning briefing; P1 entry editing + timeline search.
 **Single-user tool** — "depth" here means the stored memory works harder between captures (§9), not new users.
 
 ## 1. Product roadmap (PM)
@@ -189,7 +192,7 @@ nudges (T−14 for yearly entries).
 - Email-in capture via inbound webhook — after the iOS Shortcut proves the
   demand for out-of-app capture.
 - Household/multi-user mode — explicit user pull only.
-- Login rate limiting (section 3 #1) is still open — do with W1.
+- Login rate limiting (section 3 #1 / S1) — ✅ shipped 2026-07-12 (§10); run `db:push` at deploy.
 
 ---
 
@@ -248,12 +251,14 @@ dir, not a git repo). Read it before the next hardening pass. Non-sensitive note
 compare; `parse`/`ask` cap input length (2000/1000 chars), which bounds both prompt
 size and Claude cost. Single-user model means no IDOR surface. Good baseline.
 
-**S1 — login has no rate limiting (the one real gap).** `POST /api/auth/login`
-compares against a single `APP_PASSWORD` with no throttle or lockout, so it's an
-unauthenticated brute-force oracle guarding all your personal/health data. Fix:
-a DB-backed failed-attempt counter with backoff/lockout (in-memory won't survive
-Vercel's serverless instances). Detail + options in the private audit doc. Pair a
-strong `APP_PASSWORD` in the meantime.
+**S1 — login rate limiting — ✅ SHIPPED (2026-07-12).** `POST /api/auth/login` now
+runs a **per-IP sliding-window lockout** backed by a `LoginAttempt` table
+(`lib/loginThrottle.ts`): ≥8 failures per IP per 15 min → `429` + `Retry-After`; each
+failure also gets a 500 ms tarpit; a successful login clears that IP's history.
+Serverless-safe (state in the DB, not memory). Pure decision logic (`evaluateAttempts`,
+`getClientIp`) is unit-tested — **this repo's first tests** (vitest; `npm test`).
+⚠️ **Deploy step:** run `npm run db:push` to create the `LoginAttempt` table before/at
+deploy (schema-only change, no data migration). Still pair a strong `APP_PASSWORD`.
 
 **Quality — low priority:**
 - `safeEqual` sha256-hashes both sides before `timingSafeEqual` — correct, avoids
