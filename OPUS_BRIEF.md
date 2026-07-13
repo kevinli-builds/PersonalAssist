@@ -14,7 +14,11 @@ Verify current state before implementing._
 **Security ✅ (2026-07-12)** — the login rate-limit gap (§3 #1 / S1) is fixed: per-IP
 sliding-window lockout in `lib/loginThrottle.ts` (§10). Needs `npm run db:push` at deploy
 to create the `LoginAttempt` table.
-**Next → (do in this order)** — P0 prove the loop (PWA installed, a real push received, the 30-min GitHub Action firing); then §9 M2 Ask-with-citations ⭐ (upgrades every later feature + cuts Ask cost) and M1 interval-intelligence ⭐; §6 morning briefing; P1 entry editing + timeline search.
+**Usability ✓ (2026-07-12)** — P1 **entry editing SHIPPED**: `PATCH /api/entries/[id]`
+(validated by the pure, tested `lib/entryPatch.ts`; title/note/date only — reminders/type/tags
+stay parse-owned) + inline ✏️ edit form on each timeline card; card buttons got phone-sized
+tap padding.
+**Next → (do in this order)** — P0 prove the loop (PWA installed, a real push received, the 30-min GitHub Action firing); then §9 M2 Ask-with-citations ⭐ (upgrades every later feature + cuts Ask cost) and M1 interval-intelligence ⭐; §6 morning briefing; P1 timeline search (editing shipped, see above).
 **Single-user tool** — "depth" here means the stored memory works harder between captures (§9), not new users.
 
 ## 1. Product roadmap (PM)
