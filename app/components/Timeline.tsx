@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { deleteEntry, type Entry } from "../lib/api";
+import { deleteEntry, updateEntry, type Entry } from "../lib/api";
 
 const TYPE_ICONS: Record<string, string> = {
   event: "🎟️",
@@ -27,13 +27,77 @@ function isUpcoming(entry: Entry): boolean {
   return entry.reminders.some((r) => !r.sent && new Date(r.remindAt).getTime() >= now);
 }
 
-function Card({ entry, onDelete }: { entry: Entry; onDelete: (id: string) => void }) {
+// Entry.date ⇄ <input type="date"> in the user's local calendar (day precision).
+function toDateInput(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+function fromDateInput(value: string): string | null {
+  if (!value) return null;
+  const [y, m, d] = value.split("-").map(Number);
+  return new Date(y, m - 1, d).toISOString(); // local midnight → the day the user meant
+}
+
+function Card({ entry, onDelete, onChanged }: { entry: Entry; onDelete: (id: string) => void; onChanged: () => void }) {
+  const [editing, setEditing] = useState(false);
+  const [title, setTitle] = useState(entry.title);
+  const [note, setNote] = useState(entry.note);
+  const [date, setDate] = useState(toDateInput(entry.date));
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const startEdit = () => {
+    setTitle(entry.title);
+    setNote(entry.note);
+    setDate(toDateInput(entry.date));
+    setError("");
+    setEditing(true);
+  };
+
+  const save = async () => {
+    if (!title.trim() || busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      await updateEntry(entry.id, { title: title.trim(), note: note.trim(), date: fromDateInput(date) });
+      setEditing(false);
+      onChanged();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const nextReminder = entry.reminders.find((r) => !r.sent && new Date(r.remindAt).getTime() > Date.now());
+
+  if (editing) {
+    return (
+      <div className="entry-card">
+        <div className="entry-edit">
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" aria-label="Title" />
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} aria-label="Date" />
+          <textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Note" aria-label="Note" />
+          {error && <p className="error">{error}</p>}
+          <div className="entry-edit-actions">
+            <button className="ghost" onClick={() => setEditing(false)} disabled={busy}>Cancel</button>
+            <button className="save" onClick={save} disabled={busy || !title.trim()}>{busy ? "Saving…" : "Save"}</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="entry-card">
       <div className="entry-head">
         <span className="badge">{TYPE_ICONS[entry.type] ?? "📝"} {entry.type}</span>
         <strong>{entry.title}</strong>
+        <button className="edit" title="Edit" onClick={startEdit}>
+          ✏️
+        </button>
         <button className="delete" title="Delete" onClick={() => onDelete(entry.id)}>
           ✕
         </button>
@@ -74,7 +138,7 @@ export default function Timeline({ entries, onChanged }: { entries: Entry[]; onC
         <>
           <h2>Upcoming</h2>
           {upcoming.map((e) => (
-            <Card key={e.id} entry={e} onDelete={handleDelete} />
+            <Card key={e.id} entry={e} onDelete={handleDelete} onChanged={onChanged} />
           ))}
         </>
       )}
@@ -83,7 +147,7 @@ export default function Timeline({ entries, onChanged }: { entries: Entry[]; onC
         <>
           <h2>History</h2>
           {past.map((e) => (
-            <Card key={e.id} entry={e} onDelete={handleDelete} />
+            <Card key={e.id} entry={e} onDelete={handleDelete} onChanged={onChanged} />
           ))}
         </>
       )}

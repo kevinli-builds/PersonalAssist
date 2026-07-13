@@ -198,13 +198,55 @@ button.ghost {
   flex: 1;
 }
 
-.entry-head .delete {
+.entry-head .delete,
+.entry-head .edit {
   background: none;
   border: none;
   color: var(--muted);
   cursor: pointer;
   font-size: 0.9rem;
-  padding: 2px 6px;
+  padding: 8px; /* comfortable tap target on phones */
+}
+
+/* Inline entry editing */
+.entry-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.entry-edit input,
+.entry-edit textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: var(--card);
+  resize: vertical;
+}
+.entry-edit input:focus,
+.entry-edit textarea:focus {
+  outline: 2px solid var(--accent);
+  border-color: transparent;
+}
+.entry-edit-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.entry-edit-actions .save {
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  padding: 6px 16px;
+  cursor: pointer;
+}
+.entry-edit-actions .save:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .badge {

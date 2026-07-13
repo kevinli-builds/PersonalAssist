@@ -101,6 +101,13 @@ export function deleteEntry(id: string) {
   return api<{ ok: boolean }>(`/api/entries/${id}`, { method: "DELETE" });
 }
 
+export function updateEntry(id: string, patch: { title?: string; note?: string; date?: string | null }) {
+  return api<{ entry: Entry }>(`/api/entries/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(patch),
+  });
+}
+
 export function ask(question: string) {
   return api<{ answer: string }>("/api/ask", {
     method: "POST",
