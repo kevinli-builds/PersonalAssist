@@ -18,7 +18,21 @@ to create the `LoginAttempt` table.
 (validated by the pure, tested `lib/entryPatch.ts`; title/note/date only — reminders/type/tags
 stay parse-owned) + inline ✏️ edit form on each timeline card; card buttons got phone-sized
 tap padding.
-**Next → (do in this order)** — P0 prove the loop (PWA installed, a real push received, the 30-min GitHub Action firing); then §9 M2 Ask-with-citations ⭐ (upgrades every later feature + cuts Ask cost) and M1 interval-intelligence ⭐; §6 morning briefing; P1 timeline search (editing shipped, see above).
+**P0 loop verification (2026-07-18, agent side DONE — user steps remain)** — the send path
+is proven end-to-end short of a device: created a due reminder against the real DB, hit
+`/api/cron/notify` (local dev, same code) with `CRON_SECRET` → 200 `{due:1, sent:0}`,
+reminder flipped `sent:true`, test data cleaned up. Live app: personal-assist-gray.vercel.app.
+**Blockers found, in order:** (1) **prod `CRON_SECRET` ≠ local `.env`** — a live probe of the
+prod endpoint 401'd with the local value (so prod HAS a secret, just a different one). Align
+them (Vercel dashboard or update `.env`). (2) **The 30-min GitHub Action is a silent no-op** —
+runs green but logs "APP_URL / CRON_SECRET secrets not set — skipping". Activate:
+`gh secret set APP_URL --body "https://personal-assist-gray.vercel.app"` +
+`gh secret set CRON_SECRET` with the PROD value. (Vercel's own daily 13:00 UTC cron likely
+already authenticates — Vercel auto-sends the `CRON_SECRET` env as the Bearer header.)
+(3) **DB is empty: 0 entries, 0 push subscriptions** — nothing has ever been captured in prod
+and no device is subscribed. User: open the app on the phone, log in, (iOS: add to home
+screen), Enable notifications, capture an entry with a reminder a few minutes out.
+**Next → (do in this order)** — finish P0 (the three user steps above); then §9 M2 Ask-with-citations ⭐ (upgrades every later feature + cuts Ask cost) and M1 interval-intelligence ⭐; §6 morning briefing; P1 timeline search (editing shipped, see above).
 **Single-user tool** — "depth" here means the stored memory works harder between captures (§9), not new users.
 
 ## 1. Product roadmap (PM)
